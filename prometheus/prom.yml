@@ -10,4 +10,4 @@ scrape_configs:
     scheme: http
     scrape_interval: 15s
     static_configs:
-      - targets: ['ocr-extraction-api.railway.internal:8000']
+      - targets: ['web.railway.internal:8000']
