@@ -9,5 +9,20 @@ scrape_configs:
   - job_name: 'ocr-extraction-api'
     scheme: http
     scrape_interval: 15s
-    static_configs:
-      - targets: ['web.railway.internal:8000']
+    # Railway runs the OCR API with numReplicas > 1. The private DNS name
+    # web.railway.internal returns one AAAA record per live replica
+    # (IPv6 ULA addresses). A static_configs target would collapse to a
+    # single `instance` label; Prometheus would round-robin between
+    # replicas on successive scrapes, each scrape would OVERWRITE the
+    # previous sample, counters would appear to go backward (breaking
+    # rate()) and single-event gauges would miss ~(N-1)/N events.
+    #
+    # dns_sd_configs with type: AAAA discovers every replica and gives
+    # each its own `instance` label, so each replica is scraped on its
+    # own schedule and queries aggregate across all replicas by job.
+    dns_sd_configs:
+      - names:
+          - 'web.railway.internal'
+        type: AAAA
+        port: 8000
+        refresh_interval: 30s
