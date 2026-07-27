@@ -26,3 +26,17 @@ scrape_configs:
         type: AAAA
         port: 8000
         refresh_interval: 30s
+
+  - job_name: 'ocr-extraction-worker'
+    scheme: http
+    scrape_interval: 15s
+    # The OCR worker exposes its own Prometheus registry on the Railway private
+    # network. Discover every replica separately so queue depth can aggregate
+    # with max() and per-replica recovery counters can aggregate with sum().
+    # This also makes up{job="ocr-extraction-worker"} the worker-death signal.
+    dns_sd_configs:
+      - names:
+          - 'ocr-worker.railway.internal'
+        type: AAAA
+        port: 9091
+        refresh_interval: 30s
