@@ -26,3 +26,14 @@ scrape_configs:
         type: AAAA
         port: 8000
         refresh_interval: 30s
+
+  - job_name: 'ocr-extraction-worker'
+    scheme: http
+    metrics_path: /metrics
+    scrape_interval: 15s
+    dns_sd_configs:
+      - names:
+          - 'ocr-worker.railway.internal'
+        type: AAAA
+        port: 9091
+        refresh_interval: 30s
