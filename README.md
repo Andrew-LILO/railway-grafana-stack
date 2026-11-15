@@ -69,7 +69,7 @@ Each service has its own `VERSION` environment variable that can be set independ
 - **Prometheus Service**: Set `VERSION` to control the Prometheus Docker image tag
 - **Tempo Service**: Set `VERSION` to control the Tempo Docker image tag
 
-By default, all services use the `latest` tag, but you can pin specific versions for stability:
+If you do not set `VERSION`, each service uses the default tag from its dockerfile: Grafana `11.5.2`, Loki `3.4`, Prometheus `v3.2.1`, and Tempo `2.9.0`.
 
 Examples:
 - Grafana: `VERSION=11.5.2`
