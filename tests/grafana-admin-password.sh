@@ -4,7 +4,7 @@ set -euo pipefail
 
 root=$(cd "${1:-$(dirname "$0")/..}" && pwd)
 project="grafana-admin-password-$$"
-tmp=$(mktemp -d -t grafana-admin-password)
+tmp=$(mktemp -d "${TMPDIR:-/tmp}/grafana-admin-password.XXXXXX")
 override="$tmp/override.yml"
 failures=0
 url=
