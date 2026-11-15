@@ -4,8 +4,7 @@ set -euo pipefail
 
 root=${1:-"$(cd "$(dirname "$0")/.." && pwd)"}
 
-# Compose writes warnings to stderr and still exits 0, so the exit code alone
-# does not show them.
+# Compose can warn on stderr and still exit 0.
 if ! warnings=$(env GF_SECURITY_ADMIN_PASSWORD=unused docker compose --env-file /dev/null \
 	-f "$root/docker-compose.yml" config --quiet 2>&1); then
 	echo "$warnings" >&2

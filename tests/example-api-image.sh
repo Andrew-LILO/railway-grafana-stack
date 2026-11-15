@@ -22,8 +22,6 @@ fail() {
 	failures=$((failures + 1))
 }
 
-# Build from a copy, so the test changes nothing under examples/api. The copy
-# leaves out a real node_modules folder and holds a marker in its place.
 mkdir -p "$context/node_modules/host-marker"
 (cd "$app" && tar -cf - --exclude node_modules .) | tar -xf - -C "$context"
 echo "from the host" >"$context/node_modules/host-marker/marker.txt"
@@ -36,10 +34,8 @@ else
 	pass "$check"
 fi
 
-# The container served no request on purpose. winston-loki registers its own
-# exit hook, and when a log batch is waiting, that hook ends the process with
-# 143. This check therefore does not show exit code 0 for a container with
-# telemetry waiting.
+# No request is sent on purpose. With a pending log batch, winston-loki's
+# exit hook can exit 143 before the tracer finishes.
 check="2. docker stop of an idle container exits 0 after the tracer shuts down"
 docker run -d --name "$id" "$id" >/dev/null
 listening=
@@ -62,8 +58,6 @@ else
 	fi
 fi
 
-# The dockerfile repeats the start script, and the tracing test in
-# examples/api/test covers npm start only. Fail when the two differ.
 check="3. the image command is the start script from examples/api/package.json"
 command=$(docker image inspect -f '{{join .Config.Cmd " "}}' "$id")
 script=$(jq -r '.scripts.start' "$app/package.json")

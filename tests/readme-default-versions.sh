@@ -12,9 +12,6 @@ if [ -z "$section" ]; then
 	exit 1
 fi
 
-# The lines of the "Version Control" section that talk about the default.
-# The "Examples" list also names versions, so a line counts only when it says
-# "default".
 defaults=$(grep -i 'default' <<<"$section" || true)
 
 for entry in grafana:Grafana loki:Loki prometheus:Prometheus tempo:Tempo; do
@@ -26,7 +23,6 @@ for entry in grafana:Grafana loki:Loki prometheus:Prometheus tempo:Tempo; do
 		failures=$((failures + 1))
 		continue
 	fi
-	# The service name, then its tag as the next code span: Grafana `11.5.2`.
 	pattern="${name}[^\`]*\`${version//./\\.}\`"
 	if grep -Eq "$pattern" <<<"$defaults"; then
 		echo "PASS: README.md states the $name default, $version"
