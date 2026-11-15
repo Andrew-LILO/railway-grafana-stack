@@ -39,7 +39,7 @@ This template is perfect for teams who need a comprehensive observability soluti
 | `GF_SECURITY_ADMIN_USER` | Username for the Grafana admin account | Required input |
 | `GF_SECURITY_ADMIN_PASSWORD` | Password for the Grafana admin account | Auto-generated secure string |
 | `GF_DEFAULT_INSTANCE_NAME` | Name of your Grafana instance | `Grafana on Railway` |
-| `GF_INSTALL_PLUGINS` | Comma-separated list of Grafana plugins to install | `grafana-simple-json-datasource,grafana-piechart-panel,grafana-worldmap-panel,grafana-clock-panel` |
+| `GF_INSTALL_PLUGINS` | Comma-separated list of Grafana plugins to install. If your Grafana service has an older value, see [Remove the Angular plugins from an existing Grafana volume](#remove-the-angular-plugins-from-an-existing-grafana-volume) | `grafana-clock-panel` |
 
 ### Internal Service URLs
 
@@ -89,7 +89,7 @@ This template deploys four interconnected services:
 - The central visualization and dashboarding platform
 - Pre-configured with connections to all other services
 - Persistent volume for storing dashboards, users, and configurations
-- Comes with useful plugins pre-installed
+- Installs the plugins listed in `GF_INSTALL_PLUGINS` when it starts
 - Exposes internal URLs for other Railway services to connect to Loki, Prometheus, and Tempo
 
 ### Prometheus
@@ -185,6 +185,24 @@ docker compose exec grafana sh -c 'grafana cli admin reset-admin-password "$GF_S
 ```
 
 The second command reads the new password from the container's environment, so the password does not appear on your command line.
+
+## Remove the Angular plugins from an existing Grafana volume
+
+Older copies of this repository installed four plugins by default: `grafana-simple-json-datasource`, `grafana-piechart-panel`, `grafana-worldmap-panel`, and `grafana-clock-panel`. Grafana 11 disables Angular support by default. With that default, it refuses the first three and logs `Refusing to initialize plugin because it's using Angular` for each one every time it starts. The default is now `grafana-clock-panel`.
+
+Grafana installs plugins into the `grafana_data` volume, and the volume keeps a plugin after it leaves `GF_INSTALL_PLUGINS`. A volume that ran the old default still has the three plugins, so the errors continue.
+
+To remove them from the Docker Compose stack, first get the new `docker-compose.yml`, for example with `git pull`. A Grafana container keeps the environment it was created with. Each time it starts, its start script runs the plugin installer for every entry in `GF_INSTALL_PLUGINS`, so it installs again any plugin that is on the list and missing from the volume. The first command recreates the container with the new list, so the restart at the end does not install the three plugins again. Run:
+
+```
+docker compose up -d grafana
+docker compose exec grafana grafana cli plugins remove grafana-simple-json-datasource
+docker compose exec grafana grafana cli plugins remove grafana-piechart-panel
+docker compose exec grafana grafana cli plugins remove grafana-worldmap-panel
+docker compose restart grafana
+```
+
+On Railway, look at `GF_INSTALL_PLUGINS` in the variables of the Grafana service. If it still has the older four-plugin value, set it to `grafana-clock-panel`. Then run `grafana cli plugins remove <id>` inside the Grafana container for each of the three plugins, and restart the service.
 
 ## Additional Resources
 
