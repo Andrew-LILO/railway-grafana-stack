@@ -136,6 +136,20 @@ To send data from your other Railway applications to this observability stack:
 2. Configure your application's logging, metrics, or tracing libraries to use these URLs
 3. Your application data will automatically appear in your Grafana dashboards
 
+### Using the Docker Compose stack
+
+Prometheus, Loki, and Tempo have no authentication. For that reason, `docker-compose.yml` publishes their ports on the `127.0.0.1` address of the Docker host only: `9090`, `3100`, `3200`, `4317`, and `4318`.
+
+From the Docker host, connect to `127.0.0.1`. Do not use `localhost` or the network address of the host. The ports are not published on the IPv6 loopback address `::1`. A client that resolves `localhost` to `::1` first and does not retry on IPv4 cannot connect.
+
+Services in the same Compose project still use the service names, for example `http://loki:3100` and `http://tempo:4318`. To connect a container that is outside the project, attach it to the network of the project and use the same service names and ports.
+
+Docker does not publish these ports on the other addresses of the host, so a client on another machine cannot connect through them. Docker Engine older than 28.0.0 has one exception: a machine on the same network segment as the Docker host can reach a port that is published on `127.0.0.1`. See [Port publishing and mapping](https://docs.docker.com/engine/network/port-publishing/) in the Docker documentation.
+
+To accept connections from other machines on purpose, change `127.0.0.1` in the `ports` entry of the service and port that you want to open, for example `"127.0.0.1:4318:4318"` under `tempo`. Put your own access control in front of the port first.
+
+The Railway template does not use `docker-compose.yml`.
+
 ## Customizing Your Stack
 
 To customize the configuration of Loki, Prometheus, or Tempo:
