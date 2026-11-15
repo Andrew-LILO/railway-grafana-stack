@@ -2,28 +2,9 @@
 # Usage: loki-persistence.sh [repo root]. Needs docker and curl.
 set -euo pipefail
 
-root=$(cd "${1:-$(dirname "$0")/..}" && pwd)
-id="loki-persistence-$$"
+# shellcheck source=loki-lib.sh source-path=SCRIPTDIR
+. "$(dirname "$0")/loki-lib.sh"
 line="synthetic line $id"
-url=
-
-cleanup() {
-	docker rm -f "$id" >/dev/null 2>&1 || true
-	docker volume rm "$id" >/dev/null 2>&1 || true
-	docker image rm "$id" >/dev/null 2>&1 || true
-}
-trap cleanup EXIT
-
-wait_for() {
-	local what=$1
-	shift
-	for _ in $(seq 60); do
-		if "$@"; then return 0; fi
-		sleep 2
-	done
-	echo "FAIL: timed out waiting for $what" >&2
-	exit 1
-}
 
 metric() {
 	curl -fsS "$url/metrics" | awk -v name="$1" '
@@ -36,19 +17,8 @@ must_metric() {
 	metric "$1" || { echo "FAIL: could not read $1" >&2; exit 1; }
 }
 
-ready() { curl -fsS -o /dev/null "$url/ready" 2>/dev/null; }
 stream_evicted() { local n; n=$(metric loki_ingester_memory_streams) && [ "$n" -eq 0 ]; }
 checkpoints_reach() { local n; n=$(metric loki_ingester_checkpoint_creations_total) && [ "$n" -ge "$1" ]; }
-
-start_loki() {
-	docker run -d --name "$id" --user root -v "$id:/loki" -p 127.0.0.1::3100 "$id" \
-		-config.file=/etc/loki/loki-config.yaml "$@" >/dev/null
-	url="http://$(docker port "$id" 3100/tcp | head -n 1)"
-	wait_for "Loki to be ready" ready
-}
-
-docker build -q -f "$root/loki/dockerfile" -t "$id" "$root" >/dev/null
-docker volume create "$id" >/dev/null
 
 # The WAL is on the volume and replays a flushed line until a checkpoint drops it.
 # A 1s checkpoint interval stands in for the default 5m so the test stays short.
