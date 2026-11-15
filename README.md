@@ -148,6 +148,29 @@ To customize the configuration of Loki, Prometheus, or Tempo:
 
 The pre-configured Grafana connections will continue to work with your customized services.
 
+## Set the Grafana admin password for Docker Compose
+
+`docker-compose.yml` needs a Grafana admin password in `GF_SECURITY_ADMIN_PASSWORD`. Until you set it, any `docker compose` command that loads this file stops with an error. That includes `docker compose up`, `docker compose ps`, and `docker compose down`.
+
+Put the password in a `.env` file next to `docker-compose.yml`. Git ignores that file.
+
+```
+GF_SECURITY_ADMIN_PASSWORD='<your unique password>'
+```
+
+Keep the single quotes. Compose expands a `$` in an unquoted value, so a password that contains `$` would change.
+
+The Railway template does not use `docker-compose.yml`. Railway generates the password for you.
+
+Grafana saves the admin password in the `grafana_data` volume the first time it starts. After that, it ignores `GF_SECURITY_ADMIN_PASSWORD`. A volume created from an older copy of `docker-compose.yml` keeps the password that was published in this repository. To change the password on an existing volume, set the new value in `.env` and run:
+
+```
+docker compose up -d grafana
+docker compose exec grafana sh -c 'grafana cli admin reset-admin-password "$GF_SECURITY_ADMIN_PASSWORD"'
+```
+
+The second command reads the new password from the container's environment, so the password does not appear on your command line.
+
 ## Additional Resources
 
 - [Locomotive: a loki transport for railway services](https://railway.com/template/jP9r-f)
