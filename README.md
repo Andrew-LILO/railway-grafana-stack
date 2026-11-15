@@ -101,6 +101,7 @@ This template deploys four interconnected services:
 - Log aggregation system designed to be cost-effective
 - Horizontally scalable architecture
 - Persistent volume for log storage
+- Loki deletes logs after 31 days. To keep them longer or shorter, change `limits_config.retention_period` in `loki/loki.yml`
 
 ### Tempo
 - Distributed tracing system for tracking requests across services
