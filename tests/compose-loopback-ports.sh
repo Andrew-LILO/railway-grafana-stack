@@ -10,7 +10,7 @@ if ! config="$(env GF_SECURITY_ADMIN_PASSWORD=unused docker compose --env-file /
 fi
 
 rows="$(jq -r '
-  ["prometheus", "loki", "tempo"][] as $s
+  ["prometheus", "loki", "tempo", "example_api"][] as $s
   | if .services | has($s) | not then [$s, "missing", ""]
     else .services[$s].ports // [] | .[]
       | [$s, (if (.published // "" | tostring) == "" then "random for target \(.target)" else (.published | tostring) end), (.host_ip // "")]
@@ -34,7 +34,7 @@ while IFS=$'\t' read -r service published host_ip; do
 done <<<"$rows"
 
 if [[ "$checked" -eq 0 ]]; then
-  echo "FAIL: no published ports found for prometheus loki tempo"
+  echo "FAIL: no published ports found for prometheus loki tempo example_api"
   exit 1
 fi
 if [[ "$failed" -ne 0 ]]; then
