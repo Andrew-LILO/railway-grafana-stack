@@ -4,8 +4,8 @@ services:
     
   prometheus:
     build:
-      context: ./prometheus
-      dockerfile: dockerfile
+      context: .
+      dockerfile: prometheus/dockerfile
     user: root # required for data persistence
     ports:
       - "9090:9090"
@@ -14,8 +14,8 @@ services:
 
   loki:
     build:
-      context: ./loki
-      dockerfile: dockerfile
+      context: .
+      dockerfile: loki/dockerfile
     user: root # required for data persistence
     ports:
       - "3100:3100"
@@ -24,8 +24,8 @@ services:
 
   tempo: 
     build:
-      context: ./tempo
-      dockerfile: dockerfile
+      context: .
+      dockerfile: tempo/dockerfile
     user: root # required for data persistence
     ports:
       - "3200:3200" # http server for querying
@@ -36,8 +36,8 @@ services:
 
   grafana:
     build:
-      context: ./grafana
-      dockerfile: dockerfile
+      context: .
+      dockerfile: grafana/dockerfile
     ports:
       - "3000:3000"
     volumes:
