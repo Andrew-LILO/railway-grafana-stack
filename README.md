@@ -139,7 +139,7 @@ To send data from your other Railway applications to this observability stack:
 
 ### Using the Docker Compose stack
 
-Prometheus, Loki, and Tempo have no authentication. For that reason, `docker-compose.yml` publishes their ports on the `127.0.0.1` address of the Docker host only: `9090`, `3100`, `3200`, `4317`, and `4318`.
+Prometheus, Loki, Tempo, and the example API have no authentication. For that reason, `docker-compose.yml` publishes their ports on the `127.0.0.1` address of the Docker host only: `9090`, `3100`, `3200`, `4317`, `4318`, and `9091`.
 
 From the Docker host, connect to `127.0.0.1`. Do not use `localhost` or the network address of the host. The ports are not published on the IPv6 loopback address `::1`. A client that resolves `localhost` to `::1` first and does not retry on IPv4 cannot connect.
 
