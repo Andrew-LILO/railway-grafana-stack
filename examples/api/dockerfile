@@ -16,5 +16,6 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 9091
 
-# Command to run the application
-CMD ["npm", "start"]
+# Run node as PID 1, so it gets SIGTERM from docker stop. Keep this the same
+# as the start script in package.json.
+CMD ["node", "--import", "./tracer.js", "index.js"]
