@@ -36,7 +36,11 @@ else
 	pass "$check"
 fi
 
-check="2. docker stop exits 0 after the tracer shuts down"
+# The container served no request on purpose. winston-loki registers its own
+# exit hook, and when a log batch is waiting, that hook ends the process with
+# 143. This check therefore does not show exit code 0 for a container with
+# telemetry waiting.
+check="2. docker stop of an idle container exits 0 after the tracer shuts down"
 docker run -d --name "$id" "$id" >/dev/null
 listening=
 for _ in $(seq 60); do

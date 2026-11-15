@@ -9,12 +9,13 @@ failures=0
 # The "Examples" list also names versions, so a line counts only when it says
 # "default".
 section=$(awk '/^### Version Control/ { on = 1; next } on && /^##/ { exit } on' "$root/README.md")
-defaults=$(grep -i 'default' <<<"$section" || true)
 
 if [ -z "$section" ]; then
 	echo "FAIL: README.md has no \"Version Control\" section" >&2
 	exit 1
 fi
+
+defaults=$(grep -i 'default' <<<"$section" || true)
 
 for entry in grafana:Grafana loki:Loki prometheus:Prometheus tempo:Tempo; do
 	dir=${entry%%:*}
