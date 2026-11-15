@@ -5,9 +5,6 @@ set -euo pipefail
 root=${1:-"$(cd "$(dirname "$0")/.." && pwd)"}
 failures=0
 
-# The lines of the "Version Control" section that talk about the default.
-# The "Examples" list also names versions, so a line counts only when it says
-# "default".
 section=$(awk '/^### Version Control/ { on = 1; next } on && /^##/ { exit } on' "$root/README.md")
 
 if [ -z "$section" ]; then
@@ -15,6 +12,9 @@ if [ -z "$section" ]; then
 	exit 1
 fi
 
+# The lines of the "Version Control" section that talk about the default.
+# The "Examples" list also names versions, so a line counts only when it says
+# "default".
 defaults=$(grep -i 'default' <<<"$section" || true)
 
 for entry in grafana:Grafana loki:Loki prometheus:Prometheus tempo:Tempo; do
