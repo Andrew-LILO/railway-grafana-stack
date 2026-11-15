@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "start:tracer": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node --import ./tracer.js index.js",
+    "start:tracer": "node --import ./tracer.js index.js",
+    "test": "node --test test/tracing.test.js"
   },
   "keywords": [],
   "author": "",

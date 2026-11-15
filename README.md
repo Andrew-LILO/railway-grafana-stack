@@ -121,7 +121,7 @@ Tempo is a bit different than both Prometheus and Loki in that exposes separate 
 
 When configuring your application to send traces to Tempo, please use one of the preconfigured variables in the Tempo service: `INTERNAL_HTTP_INGEST` or `INTERNAL_GRPC_INGEST`.
 
-Another thing to note is that the ingest API endpoint for the HTTP server is `/v1/traces`. For a working example of this in a node.js express API, see `/examples/api/tracer.js` in our GitHub repository.
+Another thing to note is that the ingest API endpoint for the HTTP server is `/v1/traces`. For a working example of this in a node.js express API, see `/examples/api/tracer.js` in our GitHub repository. Load the file before the application with `node --import ./tracer.js index.js`, as the example's `start` script does.
 
 ### Using otherwise standard observability tooling
 
